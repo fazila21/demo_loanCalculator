@@ -1,11 +1,15 @@
 package com.example.administrator.myfirstapp;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import static android.provider.Settings.NameValueTable.VALUE;
 
 public class CalculatorActivity extends AppCompatActivity{
     @Override
@@ -23,10 +27,23 @@ public class CalculatorActivity extends AppCompatActivity{
         tvTotalInterest = (TextView) findViewById(R.id.total_interest);
         tvAverageMonthlyInterest = (TextView) findViewById(R.id.average_monthly_interest);
 
+        // control if shared preference is empty - default value
+        sharedPreferences = getSharedPreferences("LocalHistory", Context.MODE_PRIVATE);
+        etLoanAmount.setText(sharedPreferences.getString(LoanAmount, ""));
+        etDownPayment.setText(sharedPreferences.getString(DownPayment, ""));
+        etAnnualInterestRate.setText(sharedPreferences.getString(InterestRate, ""));
+        etTerm.setText(sharedPreferences.getString(Term, ""));
     }
 
     private EditText etLoanAmount, etDownPayment, etTerm, etAnnualInterestRate;
     private TextView tvMonthlyPayment, tvTotalRePayment, tvTotalInterest, tvAverageMonthlyInterest;
+    public SharedPreferences sharedPreferences;
+
+    // constant due to can be used multiple times with different keys
+    private static final String LoanAmount = "LA";
+    private static final String DownPayment = "DP";
+    private static final String InterestRate = "IR";
+    private static final String Term = "T";
 
     public void onClick(View v){
         switch (v.getId()){
@@ -61,6 +78,13 @@ public class CalculatorActivity extends AppCompatActivity{
             tvTotalRePayment.setText(String.valueOf(totalRepayment));
             tvTotalInterest.setText(String.valueOf(totalInterest));
             tvAverageMonthlyInterest.setText(String.valueOf(monthlyInterest));
+
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(LoanAmount, amount);
+            editor.putString(DownPayment, downPayment);
+            editor.putString(InterestRate, interestRate);
+            editor.putString(Term, term);
+            editor.commit();
         }
     }
 
